@@ -5,4 +5,5 @@ pynput
 pyperclip
 duckduckgo-search
 gtts
-pygame 
+pygame
+google-generativeai 
