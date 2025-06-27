@@ -1,3 +1,5 @@
 openai
 sounddevice
-scipy 
+scipy
+pynput
+pyperclip 
