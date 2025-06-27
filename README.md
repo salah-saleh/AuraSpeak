@@ -1,11 +1,16 @@
 # Voice-to-Text Agent
 
-This project is a modular voice-to-text agent that records audio from your microphone, sends it to OpenAI's Whisper API for transcription, and copies the result to your clipboard.
+This project is a modular voice-to-text agent that records audio from your microphone, sends it to OpenAI's Whisper API for transcription, and can:
+- Copy the result to your clipboard
+- Search the web using DuckDuckGo
+- Read text aloud using Google Text-to-Speech (gTTS)
 
 ## Features
 - Record audio from your microphone
 - Transcribe audio to text using OpenAI Whisper
 - Modular codebase for easy extension (e.g., Gemini, agent tools)
+- **Web search tool**: Say "search the web about ..." to get web results
+- **Text-to-speech tool**: Say "read this aloud ..." or "speak ..." to hear the text
 
 ## Project Structure
 
@@ -31,6 +36,12 @@ voice-text/
 ├── utils/
 │   ├── __init__.py
 │   └── clipboard.py       # Clipboard utilities
+│
+├── tools/
+│   ├── __init__.py
+│   ├── intent.py          # Intent detection logic
+│   ├── web_search.py      # Web search tool (DuckDuckGo)
+│   └── text_to_speech.py  # Text-to-speech tool (gTTS)
 ```
 
 ## Setup Instructions
@@ -57,10 +68,19 @@ export OPENAI_API_KEY="your-api-key-here"  # On Windows: set OPENAI_API_KEY="you
 python main.py
 ```
 
-## How it works
-1. Press and hold the Right Shift key to start recording.
-2. Release the Right Shift key to stop recording and transcribe.
-3. The transcript is printed and copied to your clipboard for easy pasting.
+## How to Use
+- **Clipboard (default):** Just speak and your words will be transcribed and copied to your clipboard.
+- **Web Search:** Start your speech with "search the web about ..." or "search for ..." and the agent will search DuckDuckGo and read the top result.
+- **Text-to-Speech:** Start your speech with "read this aloud ..." or "speak ..." and the agent will read your text aloud using gTTS.
+
+## Dependencies
+- `openai`: For Whisper transcription
+- `sounddevice`, `scipy`, `numpy`: For audio recording and processing
+- `pynput`: For hotkey listening
+- `pyperclip`: For clipboard operations
+- `duckduckgo-search`: For web search
+- `gtts`: For text-to-speech
+- `pygame`: For audio playback (cross-platform)
 
 ## Extending the Project
 - Add new transcription providers (e.g., Gemini) in the `transcription/` directory.

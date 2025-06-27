@@ -2,4 +2,7 @@ openai
 sounddevice
 scipy
 pynput
-pyperclip 
+pyperclip
+duckduckgo-search
+gtts
+pygame 
