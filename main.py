@@ -4,7 +4,7 @@ from ui.hotkey_listener import HotkeyListener    # Listens for hotkey events to 
 from utils.clipboard import copy_to_clipboard    # Copies text to the system clipboard
 from pynput import keyboard                      # Provides key constants (e.g., right shift, right option)
 from tools.intent import detect_intent           # Detects user intent from transcript (Gemini-based)
-from tools.web_search import search_duckduckgo   # Performs web search using DuckDuckGo
+from tools.web_search import search_duckduckgo   # Performs web search using DuckDuckGo and Gemini
 from tools.text_to_speech import speak_text      # Converts text to speech using gTTS
 
 # Use right shift + right option as the trigger key combination
@@ -36,20 +36,14 @@ def main():
             print(f"Detected intent: {intent}")
             if intent == "web_search":
                 print(f"Searching the web for: {query} (result length: {result_length})")
-                results = search_duckduckgo(query)
-                if results:
-                    print("Top results:")
-                    for i, r in enumerate(results, 1):
-                        print(f"{i}. {r['title']}\n{r['href']}\n{r['body']}\n")
-                    # Optionally, read the first result aloud (short: just title/body, detailed: more)
-                    if result_length == "short":
-                        speak_text(results[0]['body'] or results[0]['title'])
-                    else:
-                        # For detailed, concatenate more results or bodies
-                        detailed_text = " ".join([r['body'] or r['title'] for r in results])
-                        speak_text(detailed_text)
-                else:
-                    print("No results found.")
+                answer, file_path, results = search_duckduckgo(query, result_length=result_length)
+                print("\nDirect answer:")
+                print(answer)
+                print(f"\nFull results and summary saved to: {file_path}")
+                print("\nTop links:")
+                for i, r in enumerate(results, 1):
+                    print(f"{i}. {r['title']}\n{r['href']}\n")
+                speak_text(answer)
             elif intent == "tts":
                 print(f"Speaking: {query}")
                 speak_text(query)

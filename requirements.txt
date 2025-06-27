@@ -6,4 +6,5 @@ pyperclip
 duckduckgo-search
 gtts
 pygame
-google-generativeai 
+google-generativeai
+trafilatura 
