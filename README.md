@@ -12,6 +12,7 @@ This project is a modular voice-to-text agent that records audio from your micro
 - Modular codebase for easy extension (e.g., Gemini, agent tools)
 - **Web search tool**: Say "search the web about ..." to get web results (Gemini infers query and result length, scrapes and summarizes top links, and extracts a direct answer; only links are shown as results)
 - **Text-to-speech tool**: Say "read this aloud ..." or "speak ..." to hear the text (Gemini polishes the text)
+- **Built-in benchmarking**: Performance monitoring for all major operations
 
 ## Project Structure
 
@@ -36,7 +37,8 @@ voice-text/
 │
 ├── utils/
 │   ├── __init__.py
-│   └── clipboard.py       # Clipboard utilities
+│   ├── clipboard.py       # Clipboard utilities
+│   └── benchmark.py       # Performance benchmarking utilities
 │
 ├── tools/
 │   ├── __init__.py
@@ -78,6 +80,50 @@ python main.py
 - **Web Search:** Start your speech with "search the web about ..." or "search for ..." and the agent will use Gemini to infer the best query and result length, search DuckDuckGo, scrape and summarize the top links, extract a direct answer, and read it aloud. The full results and summary are saved in the `search_results/` directory. Only the top links are shown as results.
 - **Text-to-Speech:** Start your speech with "read this aloud ..." or "speak ..." and the agent will polish your text and read it aloud using gTTS.
 - **Hotkey:** Press and hold **Right Shift + Right Option** to record. Release to stop and transcribe.
+
+## Benchmarking
+
+The agent includes built-in performance monitoring to help identify bottlenecks:
+
+### What's Measured
+- **whisper_transcription**: OpenAI Whisper API call time
+- **gemini_intent_detection**: Gemini intent detection and text polishing
+- **duckduckgo_search**: DuckDuckGo search time
+- **web_scraping**: Time to scrape content from web pages
+- **gemini_summarization**: Gemini summarization of scraped content
+- **gemini_answer_extraction**: Gemini answer extraction from summary
+- **file_saving**: Time to save results to file
+- **gtts_speech**: Text-to-speech generation and playback
+- **total_processing**: Total time for the entire interaction
+
+### Benchmark Output
+After each interaction, you'll see timing information like:
+```
+[Benchmark] whisper_transcription: 1.234s
+[Benchmark] gemini_intent_detection: 0.567s
+[Benchmark] duckduckgo_search: 0.123s
+[Benchmark] web_scraping: 2.345s
+[Benchmark] gemini_summarization: 1.789s
+[Benchmark] gemini_answer_extraction: 0.456s
+[Benchmark] gtts_speech: 0.234s
+[Benchmark] total_processing: 6.758s
+
+==================================================
+BENCHMARK SUMMARY
+==================================================
+whisper_transcription:
+  Count: 1
+  Average: 1.234s
+  Min: 1.234s
+  Max: 1.234s
+  Total: 1.234s
+```
+
+### Performance Insights
+- **Web scraping** is typically the slowest operation (2-4 seconds for 3 pages)
+- **Gemini API calls** (intent detection, summarization, answer extraction) take 0.5-2 seconds each
+- **Whisper transcription** varies based on audio length (usually 1-3 seconds)
+- **TTS generation** is relatively fast (0.2-0.5 seconds)
 
 ## Improved Web Search Process
 - The agent now:

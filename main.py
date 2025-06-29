@@ -2,6 +2,7 @@ from audio.recorder import AudioRecorder         # Handles audio recording logic
 from transcription.openai_whisper import transcribe_with_whisper  # Handles transcription using OpenAI Whisper API
 from ui.hotkey_listener import HotkeyListener    # Listens for hotkey events to trigger recording
 from utils.clipboard import copy_to_clipboard    # Copies text to the system clipboard
+from utils.benchmark import benchmark_block, print_benchmark_summary  # For benchmarking
 from pynput import keyboard                      # Provides key constants (e.g., right shift, right option)
 from tools.intent import detect_intent           # Detects user intent from transcript (Gemini-based)
 from tools.web_search import search_duckduckgo   # Performs web search using DuckDuckGo and Gemini
@@ -25,31 +26,35 @@ def main():
         print("Processing...")
         filename = recorder.stop()
         if filename:
-            transcript = transcribe_with_whisper(filename)
-            print("Transcription:")
-            print(transcript)
-            # Use Gemini to detect intent, query, and result_length
-            intent_result = detect_intent(transcript)
-            intent = intent_result["intent"]
-            query = intent_result["query"]
-            result_length = intent_result.get("result_length", "default")
-            print(f"Detected intent: {intent}")
-            if intent == "web_search":
-                print(f"Searching the web for: {query} (result length: {result_length})")
-                answer, file_path, results = search_duckduckgo(query, result_length=result_length)
-                print("\nDirect answer:")
-                print(answer)
-                print(f"\nFull results and summary saved to: {file_path}")
-                print("\nTop links:")
-                for i, r in enumerate(results, 1):
-                    print(f"{i}. {r['title']}\n{r['href']}\n")
-                speak_text(answer)
-            elif intent == "tts":
-                print(f"Speaking: {query}")
-                speak_text(query)
-            else:
-                copy_to_clipboard(query)
-                print("Transcription copied to clipboard.")
+            with benchmark_block("total_processing"):
+                transcript = transcribe_with_whisper(filename)
+                print("Transcription:")
+                print(transcript)
+                # Use Gemini to detect intent, query, and result_length
+                intent_result = detect_intent(transcript)
+                intent = intent_result["intent"]
+                query = intent_result["query"]
+                result_length = intent_result.get("result_length", "default")
+                print(f"Detected intent: {intent}")
+                if intent == "web_search":
+                    print(f"Searching the web for: {query} (result length: {result_length})")
+                    answer, file_path, results = search_duckduckgo(query, result_length=result_length)
+                    print("\nDirect answer:")
+                    print(answer)
+                    print(f"\nFull results and summary saved to: {file_path}")
+                    print("\nTop links:")
+                    for i, r in enumerate(results, 1):
+                        print(f"{i}. {r['title']}\n{r['href']}\n")
+                    speak_text(answer)
+                elif intent == "tts":
+                    print(f"Speaking: {query}")
+                    speak_text(query)
+                else:
+                    copy_to_clipboard(query)
+                    print("Transcription copied to clipboard.")
+            
+            # Print benchmark summary after each interaction
+            print_benchmark_summary()
         else:
             print("No audio recorded.")
 

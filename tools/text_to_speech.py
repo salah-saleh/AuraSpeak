@@ -2,8 +2,10 @@ from gtts import gTTS  # For converting text to speech using Google TTS
 import tempfile  # For creating a temporary file to store the audio
 import os  # For file cleanup
 import pygame  # For playing the generated audio file (cross-platform)
+from utils.benchmark import benchmark_function  # For benchmarking
 
 
+@benchmark_function("gtts_speech")
 def speak_text(text, lang="en"):
     """
     Convert the given text to speech using gTTS and play it aloud using pygame.

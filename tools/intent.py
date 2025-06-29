@@ -1,6 +1,7 @@
 import os  # For accessing environment variables
 import google.generativeai as genai  # For Gemini API
 import json  # For parsing Gemini's JSON response
+from utils.benchmark import benchmark_function  # For benchmarking
 
 # Load Gemini API key from environment
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
@@ -40,6 +41,7 @@ User: This is a note, uh, wait, make that a reminder for tomorrow
 {"intent": "clipboard", "query": "reminder for tomorrow"}
 """
 
+@benchmark_function("gemini_intent_detection")
 def detect_intent(text):
     """
     Uses Gemini to detect the user's intent and extract a cleaned-up query and result length.
