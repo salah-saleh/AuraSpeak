@@ -47,7 +47,7 @@ def detect_intent(text):
     Uses Gemini to detect the user's intent and extract a cleaned-up query and result length.
     Returns a dict: {"intent": ..., "query": ..., "result_length": ...}
     """
-    model = genai.GenerativeModel("gemini-2.5-flash")
+    model = genai.GenerativeModel("gemini-2.0-flash-lite")
     prompt = SYSTEM_PROMPT + f"\nUser: {text}\n"
     response = model.generate_content(prompt)
     # Try to extract JSON from the response

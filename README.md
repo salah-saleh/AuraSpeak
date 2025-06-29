@@ -4,6 +4,8 @@ This project is a modular voice-to-text agent that records audio from your micro
 - Copy the result to your clipboard (polished, cleaned-up text)
 - Search the web using DuckDuckGo (with Gemini-inferred query and result length, direct answer extraction, and links only)
 - Read text aloud using Google Text-to-Speech (gTTS, with polished text)
+- **Interrupt and restart**: Instantly stop ongoing processing or speech and start over with a new recording
+- **Graceful shutdown**: Cleanly stop the agent and save benchmarks on Ctrl+C
 
 ## Features
 - Record audio from your microphone
@@ -13,6 +15,8 @@ This project is a modular voice-to-text agent that records audio from your micro
 - **Web search tool**: Say "search the web about ..." to get web results (Gemini infers query and result length, scrapes and summarizes top links, and extracts a direct answer; only links are shown as results)
 - **Text-to-speech tool**: Say "read this aloud ..." or "speak ..." to hear the text (Gemini polishes the text)
 - **Built-in benchmarking**: Performance monitoring for all major operations
+- **Interrupt and restart**: Press the hotkey again during processing or speech to stop and start over
+- **Graceful shutdown**: Press Ctrl+C to stop the agent and save benchmarks to a file
 
 ## Project Structure
 
@@ -80,10 +84,12 @@ python main.py
 - **Web Search:** Start your speech with "search the web about ..." or "search for ..." and the agent will use Gemini to infer the best query and result length, search DuckDuckGo, scrape and summarize the top links, extract a direct answer, and read it aloud. The full results and summary are saved in the `search_results/` directory. Only the top links are shown as results.
 - **Text-to-Speech:** Start your speech with "read this aloud ..." or "speak ..." and the agent will polish your text and read it aloud using gTTS.
 - **Hotkey:** Press and hold **Right Shift + Right Option** to record. Release to stop and transcribe.
+- **Interrupt:** If the agent is processing or speaking, press the hotkey again to immediately stop and start a new recording.
+- **Graceful shutdown:** Press Ctrl+C at any time to stop the agent, stop any ongoing speech, and save all benchmark data to a file in the `benchmarks/` directory.
 
 ## Benchmarking
 
-The agent includes built-in performance monitoring to help identify bottlenecks:
+The agent includes built-in performance monitoring to help identify bottlenecks. After each interaction, a summary is printed, and on shutdown, all benchmark data is saved to a timestamped file in the `benchmarks/` directory.
 
 ### What's Measured
 - **whisper_transcription**: OpenAI Whisper API call time

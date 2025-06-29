@@ -42,7 +42,7 @@ def search_duckduckgo(query, result_length="default", max_results=3):
 
     # 3. Summarize all content with Gemini (no intent/result_length here)
     with benchmark_block("gemini_summarization"):
-        model = genai.GenerativeModel("gemini-2.5-flash")
+        model = genai.GenerativeModel("gemini-2.0-flash-lite")
         summary_prompt = (
             f"Summarize the following information from multiple web pages about '{query}'. "
             "Focus on accuracy, clarity, and completeness.\n\n" + combined_text

@@ -1,4 +1,5 @@
 recorded.wav
 .env
 *.pyc
+benchmarks/
 search_results/
