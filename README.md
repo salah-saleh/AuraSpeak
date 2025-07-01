@@ -1,6 +1,6 @@
 # Voice-to-Text Agent
 
-This project is a modular voice-to-text agent that records audio from your microphone, sends it to OpenAI's Whisper API for transcription, and can:
+This project is a modular voice-to-text agent that records audio from your microphone, sends it to OpenAI's Whisper API and Google Speech-to-Text for transcription (benchmarked in parallel), and can:
 - Copy the result to your clipboard (polished, cleaned-up text)
 - Search the web using DuckDuckGo (with Gemini-inferred query and result length, direct answer extraction, and links only)
 - Read text aloud using Google Text-to-Speech (gTTS, with polished text)
@@ -9,7 +9,7 @@ This project is a modular voice-to-text agent that records audio from your micro
 
 ## Features
 - Record audio from your microphone
-- Transcribe audio to text using OpenAI Whisper
+- Transcribe audio to text using **both OpenAI Whisper and Google Speech-to-Text** (benchmarked in parallel)
 - **AI-powered intent detection and text polishing using Gemini**
 - Modular codebase for easy extension (e.g., Gemini, agent tools)
 - **Web search tool**: Say "search the web about ..." to get web results (Gemini infers query and result length, scrapes and summarizes top links, and extracts a direct answer; only links are shown as results)
@@ -87,12 +87,27 @@ python main.py
 - **Interrupt:** If the agent is processing or speaking, press the hotkey again to immediately stop and start a new recording.
 - **Graceful shutdown:** Press Ctrl+C at any time to stop the agent, stop any ongoing speech, and save all benchmark data to a file in the `benchmarks/` directory.
 
+## Benchmarking STT Engines
+- After each recording, the audio is sent to **both OpenAI Whisper and Google Speech-to-Text in parallel**.
+- The results and timings for both engines are printed side by side for easy comparison.
+- The rest of the pipeline uses the Whisper result by default (you can change this in `main.py`).
+
+## Google Cloud Speech-to-Text Setup
+1. **Enable the Speech-to-Text API** in your Google Cloud project.
+2. **Create a service account** and download the JSON key file.
+3. Set the environment variable:
+   ```
+   export GOOGLE_APPLICATION_CREDENTIALS="/path/to/your/service-account-key.json"
+   ```
+4. The agent will use this key to authenticate with Google STT.
+
 ## Benchmarking
 
 The agent includes built-in performance monitoring to help identify bottlenecks. After each interaction, a summary is printed, and on shutdown, all benchmark data is saved to a timestamped file in the `benchmarks/` directory.
 
 ### What's Measured
 - **whisper_transcription**: OpenAI Whisper API call time
+- **google_stt_transcription**: Google Speech-to-Text API call time
 - **gemini_intent_detection**: Gemini intent detection and text polishing
 - **duckduckgo_search**: DuckDuckGo search time
 - **web_scraping**: Time to scrape content from web pages
@@ -106,7 +121,8 @@ The agent includes built-in performance monitoring to help identify bottlenecks.
 After each interaction, you'll see timing information like:
 ```
 [Benchmark] whisper_transcription: 1.234s
-[Benchmark] gemini_intent_detection: 0.567s
+[Benchmark] google_stt_transcription: 0.567s
+[Benchmark] gemini_intent_detection: 0.123s
 [Benchmark] duckduckgo_search: 0.123s
 [Benchmark] web_scraping: 2.345s
 [Benchmark] gemini_summarization: 1.789s
@@ -123,12 +139,20 @@ whisper_transcription:
   Min: 1.234s
   Max: 1.234s
   Total: 1.234s
+
+google_stt_transcription:
+  Count: 1
+  Average: 0.567s
+  Min: 0.567s
+  Max: 0.567s
+  Total: 0.567s
 ```
 
 ### Performance Insights
 - **Web scraping** is typically the slowest operation (2-4 seconds for 3 pages)
 - **Gemini API calls** (intent detection, summarization, answer extraction) take 0.5-2 seconds each
 - **Whisper transcription** varies based on audio length (usually 1-3 seconds)
+- **Google Speech-to-Text transcription** varies based on audio length (usually 1-3 seconds)
 - **TTS generation** is relatively fast (0.2-0.5 seconds)
 
 ## Improved Web Search Process

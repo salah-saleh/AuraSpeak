@@ -7,4 +7,5 @@ duckduckgo-search
 gtts
 pygame
 google-generativeai
-trafilatura 
+trafilatura
+google-cloud-speech 

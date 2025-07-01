@@ -1,5 +1,6 @@
 from audio.recorder import AudioRecorder         # Handles audio recording logic (start/stop, file saving)
 from transcription.openai_whisper import transcribe_with_whisper  # Handles transcription using OpenAI Whisper API
+from transcription.google_stt import transcribe_with_google_stt   # Handles transcription using Google Speech-to-Text
 from ui.hotkey_listener import HotkeyListener    # Listens for hotkey events to trigger recording
 from utils.clipboard import copy_to_clipboard    # Copies text to the system clipboard
 from utils.benchmark import benchmark_block, print_benchmark_summary, benchmark_data  # For benchmarking
@@ -64,8 +65,28 @@ def main():
 
     def process_audio(filename):
         with benchmark_block("total_processing"):
-            transcript = transcribe_with_whisper(filename)
-            print("Transcription:")
+            # Run both STT engines in parallel
+            whisper_result = {}
+            google_result = {}
+            def run_whisper():
+                whisper_result["text"] = transcribe_with_whisper(filename)
+            def run_google():
+                google_result["text"] = transcribe_with_google_stt(filename)
+            t1 = threading.Thread(target=run_whisper)
+            t2 = threading.Thread(target=run_google)
+            t1.start()
+            t2.start()
+            t1.join()
+            t2.join()
+            print("\n--- STT Results ---")
+            print("[OpenAI Whisper]")
+            print(whisper_result["text"])
+            print("[Google STT]")
+            print(google_result["text"])
+            print("-------------------\n")
+            # Use Whisper result for downstream processing (or swap to google_result["text"] to compare)
+            transcript = whisper_result["text"]
+            print("Transcription (using Whisper for downstream):")
             print(transcript)
             # Use Gemini to detect intent, query, and result_length
             intent_result = detect_intent(transcript)
